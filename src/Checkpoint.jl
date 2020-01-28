@@ -10,7 +10,7 @@ function __checkpointpath(conf, path)
     "$path/$(bytes2hex(sha256(json(conf))))"
 end
 
-function initcheckpoint(conf, data, path=".")
+function initcheckpoint(conf, data; path=".")
     confstr = json(conf)
     fullpath = __checkpointpath(conf, path)
 
