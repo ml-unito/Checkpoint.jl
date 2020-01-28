@@ -4,32 +4,41 @@ using Serialization
 using JSON
 using SHA
 
-export checkpoint, resume
+export initcheckpoint, checkpoint, resume
 
-function checkpoint(conf, data; path=".")
+function __checkpointpath(conf, path)
+    "$path/$(bytes2hex(sha256(json(conf))))"
+end
+
+function initcheckpoint(conf, data, path=".")
     confstr = json(conf)
-    dirname = bytes2hex(sha256(confstr))
+    fullpath = __checkpointpath(conf, path)
 
     try
-        mkdir("$path/$dirname")
-        write("$path/$dirname/conf.json", confstr)
+        mkdir("$fullpath")
+        write("$fullpath/conf.json", confstr)
     catch err
         if err.errnum != 17
-            @error "Error while creating $path/$dirname: $err"
+            @error "Error while creating $fullpath: $err"
             exit(err.errnum)
         end
     end
 
-    @info "Serializing data on path: $path/$dirname/data.jld"
-    serialize("$path/$dirname/data.jld", data)
+    @debug "Serializing data on path: $fullpath/data.jld"
+    serialize("$fullpath/data.jld", data)
+end
+
+function checkpoint(conf, data; path=".")
+    fullpath = __checkpointpath(conf, path)
+    @debug "Serializing data on path: $fullpath/data.jld"
+    serialize("$fullpath/data.jld", data)
 end
 
 function resume(conf; path=".")
-    confstr = json(conf)
-    dirname = bytes2hex(sha256(confstr))
+    fullpath = __checkpointpath(conf, path)
 
-    @info "Deserializing data from paht: $path/$dirname/data.jld"
-    deserialize("$path/$dirname/data.jld")
+    @debug "Deserializing data from paht: $fullpath/data.jld"
+    deserialize("$fullpath/data.jld")
 end
 
 end
