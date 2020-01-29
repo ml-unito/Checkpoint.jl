@@ -80,7 +80,7 @@ end
 function resume(conf; init, path=".")
     fullpath = checkpointpath(conf, path)
 
-    if isdir($fullpath)
+    if isdir(fullpath)
         @debug "Deserializing data from paht: $fullpath/data.jld"
         return deserialize("$fullpath/data.jld")
     else
