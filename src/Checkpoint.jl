@@ -4,7 +4,7 @@ using Serialization
 using JSON
 using SHA
 
-export checkpointpath, checkpoint, resume
+export checkpointpath, checkpoint, resume, removecheckpoint
 
 """
     checkpointpath(conf; path)
@@ -65,6 +65,17 @@ function checkpoint(conf; data, path=".", nick="default")
     fullpath = checkpointpath(conf, path=path)
     @debug "Serializing data on path: $fullpath/data-$nick.jld"
     serialize("$fullpath/data-$nick.jld", data)
+end
+
+
+"""
+    Removes the given checkpoint
+"""
+
+function removecheckpoint(conf; path=".", nick="default")
+    fullpath = checkpointpath(conf, path=path)
+    @debug "Removing checkpoint on path: $fullpath/data-$nick.jld"
+    rm("$fullpath/data-$nick.jld")
 end
 
 """
