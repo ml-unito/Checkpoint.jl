@@ -7,7 +7,7 @@ using SHA
 export checkpointpath, checkpoint, resume
 
 """
-    checkpointpath(conf, path)
+    checkpointpath(conf; path)
 
     returns the complete path of the experiment identified by `conf`
 
@@ -23,12 +23,12 @@ end
 
 
 """
-    __initcheckpoint(conf, data; path)
+    __initcheckpoint(conf; data, nick, path)
 
     Creates the directory where the checkpoints will be stored.
     For internal use only.
 """
-function __initcheckpoint(conf, data; path=".")
+function __initcheckpoint(conf; data, nick, path)
     confstr = json(conf)
     fullpath = checkpointpath(conf, path=path)
 
@@ -36,8 +36,8 @@ function __initcheckpoint(conf, data; path=".")
         mkdir("$fullpath")
         write("$fullpath/conf.json", confstr)
 
-        @debug "Serializing initial data on path: $fullpath/data.jld"
-        serialize("$fullpath/data.jld", data)    
+        @debug "Serializing initial data on path: $fullpath/data-$nick.jld"
+        serialize("$fullpath/data-$nick.jld", data)    
     catch err
         if err.errnum != 17
             @error "Error while creating $fullpath: $err"
@@ -88,7 +88,7 @@ function resume(conf; init, path=".", nick="default")
         @debug "Deserializing data from paht: $fullpath/data-$nick.jld"
         return deserialize("$fullpath/data-$nick.jld")
     else
-        __initcheckpoint(conf, init, path=path)
+        __initcheckpoint(conf, data=init, path=path, nick=nick)
         return init
     end
 end
