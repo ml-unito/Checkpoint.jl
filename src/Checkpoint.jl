@@ -30,7 +30,7 @@ end
 """
 function __initcheckpoint(conf, data; path=".")
     confstr = json(conf)
-    fullpath = checkpointpath(conf, path)
+    fullpath = checkpointpath(conf, path=path)
 
     try
         mkdir("$fullpath")
@@ -62,7 +62,7 @@ end
         allows to distinguish between different versions of the same checkpoint
 """
 function checkpoint(conf; data, path=".", nick="default")
-    fullpath = checkpointpath(conf, path)
+    fullpath = checkpointpath(conf, path=path)
     @debug "Serializing data on path: $fullpath/data-$nick.jld"
     serialize("$fullpath/data-$nick.jld", data)
 end
@@ -82,7 +82,7 @@ end
 """
 
 function resume(conf; init, path=".", nick="default")
-    fullpath = checkpointpath(conf, path)
+    fullpath = checkpointpath(conf, path=path)
 
     if isdir(fullpath)
         @debug "Deserializing data from paht: $fullpath/data-$nick.jld"
