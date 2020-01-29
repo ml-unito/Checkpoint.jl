@@ -96,7 +96,7 @@ function resume(conf; init, path=".", nick="default")
     fullpath = checkpointpath(conf, path=path)
 
     if isdir(fullpath) && isfile("$fullpath/data-$nick.jld")
-        @debug "Deserializing data from paht: $fullpath/data-$nick.jld"
+        @debug "Deserializing data from path: $fullpath/data-$nick.jld"
         return deserialize("$fullpath/data-$nick.jld")
     else
         __initcheckpoint(conf, data=init, path=path, nick=nick)
