@@ -17,7 +17,7 @@ export checkpointpath, checkpoint, resume
         can be serialized to json
     * path: path where the experiments need to be rooted
 """
-function checkpointpath(conf, path)
+function checkpointpath(conf; path=".")
     "$path/$(bytes2hex(sha256(json(conf))))"
 end
 
@@ -58,11 +58,13 @@ end
     * data: the data for the checkpoint. It should contain every piece of 
         information needed to resume the eperiment.
     * path: path where the experiments need to be rooted
+    * nick: (nickname) additional name specifier for the experiment. If set it
+        allows to distinguish between different versions of the same checkpoint
 """
-function checkpoint(conf, data; path=".")
+function checkpoint(conf; data, path=".", nick="default")
     fullpath = checkpointpath(conf, path)
-    @debug "Serializing data on path: $fullpath/data.jld"
-    serialize("$fullpath/data.jld", data)
+    @debug "Serializing data on path: $fullpath/data-$nick.jld"
+    serialize("$fullpath/data-$nick.jld", data)
 end
 
 """
@@ -75,14 +77,16 @@ end
     * init: the initialization values for the experiment. They should be such
         that if the experiment were to be resumed from them, it would run
         from the start.
+    * nick: (nickname) additional name specifier for the experiment. If set it
+        allows to distinguish between different versions of the same checkpoint
 """
 
-function resume(conf; init, path=".")
+function resume(conf; init, path=".", nick="default")
     fullpath = checkpointpath(conf, path)
 
     if isdir(fullpath)
-        @debug "Deserializing data from paht: $fullpath/data.jld"
-        return deserialize("$fullpath/data.jld")
+        @debug "Deserializing data from paht: $fullpath/data-$nick.jld"
+        return deserialize("$fullpath/data-$nick.jld")
     else
         __initcheckpoint(conf, init, path=path)
         return init
