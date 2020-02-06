@@ -24,7 +24,7 @@ end
 """
     Creates the path for the checkpoints if it does not exists yet.
 """
-function mkcheckpointpath(conf)
+function mkcheckpointpath(conf; path)
     confstr = json(conf)
     fullpath = checkpointpath(conf, path=path)
 
