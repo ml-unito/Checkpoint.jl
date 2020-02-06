@@ -4,7 +4,7 @@ using Serialization
 using JSON
 using SHA
 
-export checkpointpath, checkpoint, resume, removecheckpoint
+export checkpointpath, checkpoint, resume, removecheckpoint, mkcheckpointpath
 
 """
     checkpointpath(conf; path)
@@ -21,6 +21,17 @@ function checkpointpath(conf; path=".")
     "$path/$(bytes2hex(sha256(json(conf))))"
 end
 
+"""
+    Creates the path for the checkpoints if it does not exists yet.
+"""
+function mkcheckpointpath(conf)
+    confstr = json(conf)
+    fullpath = checkpointpath(conf, path=path)
+
+    if !isdir(fullpath)
+        mkdir("$fullpath")
+    end
+end
 
 """
     __initcheckpoint(conf; data, nick, path)
@@ -33,7 +44,7 @@ function __initcheckpoint(conf; data, nick, path)
     fullpath = checkpointpath(conf, path=path)
 
     try
-        mkdir("$fullpath")
+        mkcheckpointpath(conf)
         write("$fullpath/conf.json", confstr)
 
         @debug "Serializing initial data on path: $fullpath/data-$nick.jld"
