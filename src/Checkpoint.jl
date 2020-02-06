@@ -44,7 +44,7 @@ function __initcheckpoint(conf; data, nick, path)
     fullpath = checkpointpath(conf, path=path)
 
     try
-        mkcheckpointpath(conf)
+        mkcheckpointpath(conf, path=path)
         write("$fullpath/conf.json", confstr)
 
         @debug "Serializing initial data on path: $fullpath/data-$nick.jld"
