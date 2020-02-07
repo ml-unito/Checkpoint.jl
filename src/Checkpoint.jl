@@ -3,6 +3,7 @@ module Checkpoint
 using Serialization
 using JSON
 using SHA
+using Logging
 
 export checkpointpath, checkpoint, resume, removecheckpoint, mkcheckpointpath
 
@@ -31,6 +32,11 @@ function mkcheckpointpath(conf; path)
     if !isdir(fullpath)
         mkdir("$fullpath")
     end
+end
+
+function __flush_logging()
+    logger = global_logger()
+    flush(logger.stream)
 end
 
 """
@@ -76,6 +82,7 @@ function checkpoint(conf; data, path=".", nick="default")
     fullpath = checkpointpath(conf, path=path)
     @debug "Serializing data on path: $fullpath/data-$nick.jld"
     serialize("$fullpath/data-$nick.jld", data)
+    __flush_logging()
 end
 
 
@@ -87,6 +94,7 @@ function removecheckpoint(conf; path=".", nick="default")
     fullpath = checkpointpath(conf, path=path)
     @debug "Removing checkpoint on path: $fullpath/data-$nick.jld"
     rm("$fullpath/data-$nick.jld")
+    __flush_logging()
 end
 
 """
@@ -105,14 +113,18 @@ end
 
 function resume(conf; init, path=".", nick="default")
     fullpath = checkpointpath(conf, path=path)
+    result = None
 
     if isdir(fullpath) && isfile("$fullpath/data-$nick.jld")
         @debug "Deserializing data from path: $fullpath/data-$nick.jld"
-        return deserialize("$fullpath/data-$nick.jld")
+        result = deserialize("$fullpath/data-$nick.jld")
     else
         __initcheckpoint(conf, data=init, path=path, nick=nick)
-        return init
+        result = init
     end
+
+    __flush_logging()
+    result
 end
 
 end
