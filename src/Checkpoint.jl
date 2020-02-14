@@ -113,7 +113,7 @@ end
 
 function resume(conf; init, path=".", nick="default")
     fullpath = checkpointpath(conf, path=path)
-    result = None
+    result = Nothing
 
     if isdir(fullpath) && isfile("$fullpath/data-$nick.jld")
         @debug "Deserializing data from path: $fullpath/data-$nick.jld"
